@@ -5,8 +5,7 @@ from statsmodels.tsa.arima_process import ArmaProcess
 from statsmodels.stats.diagnostic import acorr_ljungbox
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.stattools import adfuller
-from statsmodels.tsa.stattools import pacf
-from statsmodels.tsa.stattools import acf
+from statsmodels.tsa.stattools import acf, pacf
 from tqdm import tqdm_notebook
 import matplotlib.pyplot as plt
 import numpy as np
@@ -33,24 +32,42 @@ plt.show()
 '''
 closePrice = list(reversed(wSPY['close']))
 
-print(simulated_ARMA_data)
-print(closePrice)
+#print(simulated_ARMA_data)
+#print(closePrice)
 plt.figure(figsize=[15, 7.5]); # Set dimensions for figure
 plt.plot(closePrice)
 plt.title("Weekly SPY")
 plt.xlim([0, 1143])
 plt.show()
 
+diffPrice = list()
+for i in range(1,len(closePrice)-2):
+    diffPrice.append(closePrice[i]-closePrice[i-1])
 
-plot_pacf(simulated_ARMA_data);
+print(diffPrice)
+
+plt.figure(figsize=[15, 7.5]); # Set dimensions for figure
+plt.plot(diffPrice)
+plt.title("differenced SPY")
+plt.xlim([0, 1143])
 plt.show()
 
-plot_acf(simulated_ARMA_data);
+
+#plot_pacf(simulated_ARMA_data);
+#plt.show()
+
+#plot_acf(simulated_ARMA_data);
 
 #plot_pacf(closePrice)
 # Augmented Dickey-Fuller test
 
 #data = pd.read_csv('jj.csv')
-ad_fuller_result = adfuller(closePrice)
-print(f'ADF Statistic: {ad_fuller_result[0]}')
-print(f'p-value: {ad_fuller_result[1]}')
+#ad_fuller_result = adfuller(closePrice)
+#print(f'ADF Statistic: {ad_fuller_result[0]}')
+#print(f'p-value: {ad_fuller_result[1]}')
+
+acf_1 =  acf(diffPrice, nlags=7)
+print(acf_1)
+plt.plot(acf_1)
+plt.show()
+
