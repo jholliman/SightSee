@@ -25,6 +25,7 @@ dates = list(reversed(wSPY['timestamp']))
 print('length of close price array: ' + str(len(closePrice)))
 
 diffPrice = list()
+diffPrice.append(0)
 for i in range(1,len(closePrice)):
     diffPrice.append((closePrice[i]-closePrice[i-1]))
 
@@ -47,11 +48,20 @@ model_fit = model.fit()
 # print summary of fit model
 
 
+fig = plt.figure()
+plt.subplot(2,1,1)
+plt.hist(diffPrice,bins=40)
+titleStr2 = 'Price change histogram, mean: ' + str(statistics.mean(diffPrice))[0:7]
+plt.title(titleStr2)
+plt.show
 
+plt.subplot(2,1,2)
 plt.hist(model_fit.resid,bins=40)
 titleStr = 'Residuals from ARIMA, mean: ' + str(statistics.mean(model_fit.resid))[0:7]
 plt.title(titleStr)
 plt.show
+
+
 
 
 fig = plt.figure()
@@ -78,6 +88,11 @@ plt.title("PACF plot")
 plt.ylim([-0.5,0.5])
 plt.show()
 
+plt.plot(diffPrice, label="differenced price")
+plt.plot(model_fit.predict(), label="model price")
+plt.xlim([0,106])
+plt.title("price changes: observed and predicted")
+plt.show()
 
 
 #some prediction stuff
