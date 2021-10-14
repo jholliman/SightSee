@@ -1,16 +1,8 @@
-from os import sep
-from numpy.linalg import multi_dot
-from statsmodels.graphics.tsaplots import plot_pacf
-from statsmodels.graphics.tsaplots import plot_acf
-from statsmodels.tsa.arima_process import ArmaProcess
-from statsmodels.stats.diagnostic import acorr_ljungbox
-from statsmodels.tsa.statespace.sarimax import SARIMAX
-from statsmodels.tsa.statespace.tools import diff
+
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.stattools import acf, pacf
 from statsmodels.tsa.arima.model import ARIMA
 
-from tqdm import tqdm_notebook
 import matplotlib.pyplot as plt
 import numpy as np
 import statistics
