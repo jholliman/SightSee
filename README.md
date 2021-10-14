@@ -1,0 +1,2 @@
+# SightSee
+forecasting stock prices
