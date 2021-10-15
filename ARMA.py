@@ -10,10 +10,13 @@ import pandas as pd
 import warnings
 warnings.filterwarnings('ignore')
 
-wSPY = pd.read_csv('daily_SPY_20211012.csv', sep=',')
+tickerStr = "USB"
+fileName = 'daily_'+tickerStr+ '_2021-10-14'
 
-closePrice = list(reversed(wSPY['close']))
-dates = list(reversed(wSPY['timestamp']))
+dataFile = pd.read_csv(fileName, sep=',')
+
+closePrice = list(reversed(dataFile['close']))
+dates = list(reversed(dataFile['timestamp']))
 print('length of close price array: ' + str(len(closePrice)))
 
 diffPrice = list()
@@ -35,21 +38,13 @@ pacf_1 = pacf(diffPrice, nlags=7)
 print(max(abs(acf_1[1:])))
 
 
-model = ARIMA(diffPrice, order=(3,0,0))
+model = ARIMA(diffPrice, order=(5,0,0))
 model_fit = model.fit()
 # print summary of fit model
 
 
-fig = plt.figure()
-plt.subplot(2,1,1)
-plt.hist(diffPrice,bins=40)
-titleStr2 = 'Price change histogram, mean: ' + str(statistics.mean(diffPrice))[0:7]
-plt.title(titleStr2)
-plt.show
-
-plt.subplot(2,1,2)
 plt.hist(model_fit.resid,bins=40)
-titleStr = 'Residuals from ARIMA, mean: ' + str(statistics.mean(model_fit.resid))[0:7]
+titleStr = 'Residuals from ARIMA, mean: ' + str(statistics.mean(model_fit.resid))[0:7] + ", STDDEV: " + str(statistics.stdev(model_fit.resid))[0:7]
 plt.title(titleStr)
 plt.show
 
@@ -60,13 +55,13 @@ fig = plt.figure()
 plt.subplot(2,2,1)
 #plt.figure(figsize=[15, 7.5]); # Set dimensions for figure
 plt.plot(closePrice)
-plt.title("daily SPY")
+plt.title("daily "+ tickerStr)
 #plt.xlim([0, 1143])
 
 plt.subplot(2,2,2)
 #plt.figure(figsize=[15, 7.5]); # Set dimensions for figure
 plt.plot(diffPrice)
-plt.title("differenced SPY")
+plt.title("differenced  " + tickerStr)
 #plt.xlim([0, 1143])
 
 plt.subplot(2,2,3)
@@ -99,19 +94,19 @@ fig.subplots_adjust(hspace=.5)
 plt.subplot(3,1,1)
 plt.plot(closePrice, label="closing price")
 plt.xlim([90,106])
-plt.ylim([427,440])
-plt.title("SPY Price")
+plt.title(tickerStr + "Price")
 
 plt.subplot(3,1,2)
 plt.plot(diffPrice, label="differenced price")
 plt.plot(model_fit.predict(), label="model price")
+plt.plot(scaledXValues,castedValues, label="forecasted prices")
 plt.xlim([90,106])
 plt.title("price changes: observed and predicted")
 
 plt.subplot(3,1,3)
 plt.plot(scaledXValues,castedValues, label="forecasted prices")
 plt.xlim([90,106])
-plt.title("forecasted values")
+plt.title("forecasted values (Tomorrow's price change: "+str(model_fit.forecast(2))+")")
 plt.show()
 
 
