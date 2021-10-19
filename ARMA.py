@@ -86,11 +86,7 @@ plt.title("price changes: observed and predicted")
 plt.show()
 
 
-plt.plot(diffPrice, label="differenced price")
-plt.plot(model_fit.predict(), label="model price")
-plt.xlim([0,106])
-plt.title("price changes: observed and predicted")
-plt.show()
+
 
 #some prediction stuff
 castedValues = model_fit.forecast(5)
