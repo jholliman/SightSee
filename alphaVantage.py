@@ -12,7 +12,7 @@ dataFile = pd.read_csv(fileName, sep=',')
 symbolList = list(dataFile['symbol'])
 print(symbolList)
 
-#download data (rest between every 4 ticker requests to comply with API limits)
+#download data from AlphaVantage
 for i in range(1,dataFile.size):
 
     #sleep once in a while because API limits
@@ -24,15 +24,9 @@ for i in range(1,dataFile.size):
     urlStr = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='+symbol+'&apikey=AXZVX7TJLYCJBNPU&datatype=csv'
     fileStr = "daily_" + symbol + "_" + todaysDate
     r = requests.get(urlStr)
-    #data = r.json()
-
-    #print(r)
-
-    #with open('testDataSPY.json','w') as f:
-    #    json.dump(data, f)
     print('what is http response: ' + str(r))
 
-
+    #write to CSV
     if str(r)=='<Response [200]>':
         with open(fileStr, 'w') as f:
             writer = csv.writer(f)
@@ -40,13 +34,12 @@ for i in range(1,dataFile.size):
                 writer.writerow(line.decode('utf-8').split(','))
 
 
-for i in range(1,dataFile.size):
+'''
+#check data for empty strings (these sometimes appear when requesting data from AV, which is annoying)
+for i in range(0,dataFile.size):
 
-    #sleep once in a while because API limits
-    if i%5 == 0:
-        time.sleep(60)
-    
-    symbol = str(symbolList[i-1])
+
+    symbol = str(symbolList[i])
     print("getting data for symbol: " + symbol)
     urlStr = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='+symbol+'&apikey=AXZVX7TJLYCJBNPU&datatype=csv'
     fileStr = "daily_" + symbol + "_" + todaysDate
@@ -66,4 +59,4 @@ for i in range(1,dataFile.size):
             for line in r.iter_lines():
                 writer.writerow(line.decode('utf-8').split(','))
 
-
+'''

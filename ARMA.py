@@ -8,10 +8,14 @@ import numpy as np
 import statistics
 import pandas as pd
 import warnings
+from datetime import datetime
+
 warnings.filterwarnings('ignore')
 
+todaysDate = datetime.today().strftime('%Y-%m-%d')
+
 tickerStr = "SPY"
-fileName = 'daily_'+tickerStr+ '_2021-10-15'
+fileName = 'daily_'+tickerStr+ '_' + todaysDate
 
 dataFile = pd.read_csv(fileName, sep=',')
 
@@ -38,7 +42,7 @@ pacf_1 = pacf(diffPrice, nlags=7)
 print(max(abs(acf_1[1:])))
 
 
-model = ARIMA(diffPrice, order=(1,0,0))
+model = ARIMA(diffPrice, order=(3,0,0))
 model_fit = model.fit()
 # print summary of fit model
 
@@ -112,7 +116,7 @@ plt.title("price changes: observed and predicted")
 plt.subplot(3,1,3)
 plt.plot(scaledXValues,castedValues, label="forecasted prices")
 plt.xlim([90,106])
-plt.title("forecasted values (Tomorrow's price change: "+str(model_fit.forecast(2))+")")
+plt.title("forecasted values (Tomorrow's price change: "+str(model_fit.forecast(1))+")")
 plt.show()
 
 

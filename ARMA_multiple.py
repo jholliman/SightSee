@@ -1,5 +1,5 @@
 
-from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.stattools import adfuller, pacf_burg
 from statsmodels.tsa.stattools import acf, pacf
 from statsmodels.tsa.arima.model import ARIMA
 
@@ -9,6 +9,7 @@ import statistics
 import pandas as pd
 import warnings
 from datetime import datetime
+warnings.filterwarnings('ignore')
 
 todaysDate = datetime.today().strftime('%Y-%m-%d')
 
@@ -20,6 +21,11 @@ symbolList = list(dataFile['symbol'])
 
 nameArray = list()
 maxPACF = list()
+
+
+fig = plt.figure()
+#plt.figure(figsize=[15, 7.5]); # Set dimensions for figure
+
 
 for i in range(0,len(symbolList)):
 
@@ -33,8 +39,8 @@ for i in range(0,len(symbolList)):
 
     diffPrice = list()
     diffPrice.append(0)
-    for i in range(1,len(closePrice)):
-        diffPrice.append((closePrice[i]-closePrice[i-1]))
+    for n in range(1,len(closePrice)):
+        diffPrice.append((closePrice[n]-closePrice[n-1]))
 
 
     # Augmented Dickey-Fuller test
@@ -50,9 +56,14 @@ for i in range(0,len(symbolList)):
     nameArray.append(tickerStr)
     maxPACF.append(max(abs(acf_1[1:])))
 
+    plt.subplot(1,len(symbolList),(i+1))
+    plt.plot(pacf_1)
+    plt.xlim(1,5)
+    plt.title("PACF "+ tickerStr + ", " + str(max(abs(acf_1[1:])))[0:5], size=10)
 
     print('The max autocorrelation coef for ' + tickerStr + 'is ' + str(max(abs(acf_1[1:]))))
 
+plt.show()
 
 '''
 model = ARIMA(diffPrice, order=(,0,0))
