@@ -10,8 +10,8 @@ import pandas as pd
 import warnings
 warnings.filterwarnings('ignore')
 
-tickerStr = "USB"
-fileName = 'daily_'+tickerStr+ '_2021-10-14'
+tickerStr = "SPY"
+fileName = 'daily_'+tickerStr+ '_2021-10-15'
 
 dataFile = pd.read_csv(fileName, sep=',')
 
@@ -38,7 +38,7 @@ pacf_1 = pacf(diffPrice, nlags=7)
 print(max(abs(acf_1[1:])))
 
 
-model = ARIMA(diffPrice, order=(5,0,0))
+model = ARIMA(diffPrice, order=(1,0,0))
 model_fit = model.fit()
 # print summary of fit model
 
@@ -81,6 +81,12 @@ plt.xlim([0,106])
 plt.title("price changes: observed and predicted")
 plt.show()
 
+
+plt.plot(diffPrice, label="differenced price")
+plt.plot(model_fit.predict(), label="model price")
+plt.xlim([0,106])
+plt.title("price changes: observed and predicted")
+plt.show()
 
 #some prediction stuff
 castedValues = model_fit.forecast(5)

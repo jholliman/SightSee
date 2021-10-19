@@ -8,8 +8,12 @@ import numpy as np
 import statistics
 import pandas as pd
 import warnings
+from datetime import datetime
 
-fileName = 'BankStocks_NYSE.csv'
+todaysDate = datetime.today().strftime('%Y-%m-%d')
+
+
+fileName = 'Watchlist.csv'
 dataFile = pd.read_csv(fileName, sep=',')
 
 symbolList = list(dataFile['symbol'])
@@ -17,11 +21,10 @@ symbolList = list(dataFile['symbol'])
 nameArray = list()
 maxPACF = list()
 
-for i in range(1,54):
+for i in range(0,len(symbolList)):
 
-    tickerStr = str(symbolList[i-1])
-    fileName = 'daily_'+tickerStr+ '_2021-10-14'
-
+    tickerStr = str(symbolList[i])
+    fileName = 'daily_'+tickerStr+ "_" + todaysDate
     dataFile = pd.read_csv(fileName, sep=',')
 
     closePrice = list(reversed(dataFile['close']))
