@@ -24,21 +24,23 @@ for i in range(1,dataFile.size):
     
     symbol = str(symbolList[i-1])
     print("getting data for symbol: " + symbol)
-    urlStr = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='+symbol+'&outputsize=full&apikey=AXZVX7TJLYCJBNPU&datatype=csv'
+    urlStr = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol='+symbol+'&outputsize=full&apikey=AXZVX7TJLYCJBNPU&datatype=csv'
     fileStr = "daily_" + symbol + "_" + todaysDate
-    r = requests.get(urlStr)
-    print('what is http response: ' + str(r))
+    requestAV = requests.get(urlStr)
+    print('what is http response: ' + str(requestAV))
 
     #write to CSV
-    if str(r)=='<Response [200]>':
-        with open(fileStr, 'w') as f:
-            writer = csv.writer(f)
-            for line in r.iter_lines():
-                writer.writerow(line.decode('utf-8').split(','))
+    if str(requestAV) =='<Response [200]>':
+        initialFile = open(fileStr,'w')
+        writer = csv.writer(initialFile)
+        for line in requestAV.iter_lines():
+            writer.writerow(line.decode('utf-8').split(','))
+        initialFile.close()
 
-    #read CSV and remove any empty strings
+    #read original CSV and re-write without any empty rows 
+    #not sure why ALphaVantage sometimes has empty rows
     oldCSV = open(fileStr, 'r')
-    cleanedCSV = open(fileStr+'first_edit.csv', 'w')
+    cleanedCSV = open(fileStr+'_edit', 'w')
     writer = csv.writer(cleanedCSV)
     for row in csv.reader(oldCSV):
         print(row)
@@ -46,6 +48,8 @@ for i in range(1,dataFile.size):
             writer.writerow(row)
     oldCSV.close()
     cleanedCSV.close()
+    os.remove(fileStr)
+    os.rename(fileStr+'_edit',fileStr)
 
 
 '''
