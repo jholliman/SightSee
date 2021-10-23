@@ -20,7 +20,7 @@ fileName = 'daily_'+tickerStr+ '_' + todaysDate
 
 dataFile = pd.read_csv(fileName, sep=',')
 
-closePrice = list(reversed(dataFile['close']))
+closePrice = list(reversed(dataFile['close']))[:1000]
 dates = list(reversed(dataFile['timestamp']))
 print('length of close price array: ' + str(len(closePrice)))
 
@@ -38,9 +38,10 @@ print('length of price changed array: ' + str(len(diffPrice)))
 #print(f'ADF Statistic: {ad_fuller_result[0]}')
 #print(f'p-value: {ad_fuller_result[1]}')
 
-acf_1 =  acf(diffPrice, nlags=7)
-pacf_1 = pacf(diffPrice, nlags=7)
-print(max(abs(acf_1[1:])))
+acf_diffPrice =  acf(diffPrice, nlags=7)
+pacf_diffPrice = pacf(diffPrice, nlags=7)
+
+print(max(abs(pacf_diffPrice[1:])))
 
 
 armaModel = ARIMA(diffPrice, order=(3,0,0))
@@ -53,9 +54,10 @@ titleStr = 'Residuals from ARIMA, mean: ' + str(statistics.mean(armaModelFit.res
 plt.title(titleStr)
 plt.show
 
-archModel = arch_model(armaModelFit.resid,mean='Zero',vol='ARCH',p=4)
+archModel = arch_model(armaModelFit.resid,mean='Zero',vol='ARCH',p=3)
 archModelFit = archModel.fit()
 
+pacf_ArchModel = pacf(archModelFit.conditional_volatility, nlags=7)
 
 
 
@@ -69,24 +71,21 @@ plt.title("daily "+ tickerStr)
 plt.subplot(2,2,2)
 #plt.figure(figsize=[15, 7.5]); # Set dimensions for figure
 plt.plot(diffPrice)
-plt.title("differenced  " + tickerStr)
+plt.plot(armaModelFit.predict())
+plt.plot(armaModelFit.resid)
+plt.title("differenced priced, ARMA and ARMA residuals" + tickerStr)
 #plt.xlim([0, 1143])
 
 plt.subplot(2,2,3)
-plt.plot(acf_1)
-plt.title("ACF plot")
-plt.ylim([-0.5,0.5])
+plt.plot(pacf_ArchModel)
+plt.title("PACF plot - Arc Model, max PACF: " + str(max(abs(pacf_ArchModel[1:])))[:4])
+plt.ylim([-0.9,0.9])
 
 plt.subplot(2,2,4)
-plt.plot(pacf_1)
-plt.title("PACF plot")
-plt.ylim([-0.5,0.5])
-plt.show()
-
-plt.plot(diffPrice, label="differenced price")
+plt.plot(armaModelFit.resid, label="ARMA residuals")
 plt.plot(archModelFit.conditional_volatility, label="model price")
 plt.xlim([0,106])
-plt.title("price changes and conditional volatility")
+plt.title("ARMA residuals and conditional volatility")
 plt.show()
 
 

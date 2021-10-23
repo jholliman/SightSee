@@ -2,6 +2,7 @@
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.stattools import acf, pacf
 from statsmodels.tsa.arima.model import ARIMA
+#token: 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
 
 import matplotlib.pyplot as plt
 import numpy as np
