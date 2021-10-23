@@ -20,7 +20,7 @@ fileName = 'daily_'+tickerStr+ '_' + todaysDate
 
 dataFile = pd.read_csv(fileName, sep=',')
 
-closePrice = list(reversed(dataFile['close']))[:1000]
+closePrice = list(reversed(dataFile['adjusted_close']))[:1000]
 dates = list(reversed(dataFile['timestamp']))
 print('length of close price array: ' + str(len(closePrice)))
 
