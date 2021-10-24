@@ -13,15 +13,15 @@ from alphaVantage import AlphaVantage
 from datetime import datetime
 warnings.filterwarnings('ignore')
 
+#configurable variables###############
 todaysDate = datetime.today().strftime('%Y-%m-%d')
-AV = AlphaVantage()
-
-
 tickerStr = "SPY"
-sampleSize = 200 #how many previous samples to consider, be it days or minutes if intraday data
+sampleSize = 150 #how many previous samples to consider in ARMA model, be it days or minutes
+forecastDays = 5
+########################################
 
+AV = AlphaVantage()
 fileName = 'daily_'+tickerStr+ '_' + todaysDate
-
 dataFile = pd.read_csv(fileName, sep=',')
 
 #AV.downloadDailyMultiple('Watchlist_small')
@@ -46,8 +46,8 @@ print('length of price changed array: ' + str(len(diffPrice)))
 #print(f'ADF Statistic: {ad_fuller_result[0]}')
 #print(f'p-value: {ad_fuller_result[1]}')
 
-acf_1 =  acf(diffPrice, nlags=3)
-pacf_1 = pacf(diffPrice, nlags=3)
+acf_1 =  acf(diffPrice, nlags=10)
+pacf_1 = pacf(diffPrice, nlags=10)
 print(max(abs(acf_1[1:])))
 
 
@@ -56,10 +56,7 @@ model_fit = model.fit()
 # print summary of fit model
 
 
-plt.hist(model_fit.resid,bins=40)
-titleStr = 'Residuals from ARIMA, mean: ' + str(statistics.mean(model_fit.resid))[0:7] + ", STDDEV: " + str(statistics.stdev(model_fit.resid))[0:7]
-plt.title(titleStr)
-plt.show
+
 
 #can change the denominator to make more ticks
 numTicks = 5
@@ -67,7 +64,6 @@ axisTicksSpacing = sampleSize/numTicks
 axisTicksArray = list()
 for i in range(0,numTicks):
     axisTicksArray.append((i*axisTicksSpacing))
-print(axisTicksArray)
 
 fig = plt.figure()
 plt.subplot(2,2,1)
@@ -91,17 +87,29 @@ plt.title("PACF plot")
 plt.ylim([-0.5,0.5])
 plt.show()
 
-plt.plot(dates, diffPrice, label="differenced price")
+
+
+castedValues = model_fit.forecast(forecastDays)
+scaledXValues = range(len(diffPrice)-1,(len(diffPrice)+ len(castedValues)-1))
+print(castedValues)
+print(list(scaledXValues))
+
+fig = plt.figure()
+plt.subplot(2,1,1)
+plt.hist(model_fit.resid,bins=40)
+titleStr = 'Residuals from ARIMA, mean: ' + str(statistics.mean(model_fit.resid))[0:7] + ", STDDEV: " + str(statistics.stdev(model_fit.resid))[0:7]
+plt.title(titleStr)
+
+plt.subplot(2,1,2)
 plt.plot(dates, model_fit.predict(), label="model price")
-plt.xlim(0,sampleSize+10)
-plt.xticks(ticks=axisTicksArray)
-plt.title("price changes: observed and predicted")
+plt.plot(scaledXValues,castedValues, label="forecasted prices")
+plt.xlim(sampleSize-20,sampleSize+forecastDays)
+plt.title("forecasted values (Tomorrow's price change: "+str(model_fit.forecast(1))+")")
 plt.show()
 
 
-
-
 #some prediction stuff
+'''
 castedValues = model_fit.forecast(5)
 scaledXValues = range(len(diffPrice)-1,(len(diffPrice)+ len(castedValues)-1))
 print(castedValues)
@@ -129,4 +137,5 @@ plt.xlim(0,sampleSize+10)
 plt.show()
 
 
+'''
 
