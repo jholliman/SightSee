@@ -9,18 +9,23 @@ import numpy as np
 import statistics
 import pandas as pd
 import warnings
+from alphaVantage import AlphaVantage
 from datetime import datetime
 
 warnings.filterwarnings('ignore')
 
 todaysDate = datetime.today().strftime('%Y-%m-%d')
+AV = AlphaVantage()
+
+AV.downloadMultiple('Watchlist_small')
+
 
 tickerStr = "SPY"
 fileName = 'daily_'+tickerStr+ '_' + todaysDate
 
 dataFile = pd.read_csv(fileName, sep=',')
 
-closePrice = list(reversed(dataFile['close']))
+closePrice = list(reversed(dataFile['adjusted_close']))
 dates = list(reversed(dataFile['timestamp']))
 print('length of close price array: ' + str(len(closePrice)))
 
@@ -100,19 +105,16 @@ fig.subplots_adjust(hspace=.5)
 
 plt.subplot(3,1,1)
 plt.plot(closePrice, label="closing price")
-plt.xlim([90,106])
 plt.title(tickerStr + "Price")
 
 plt.subplot(3,1,2)
 plt.plot(diffPrice, label="differenced price")
 plt.plot(model_fit.predict(), label="model price")
 plt.plot(scaledXValues,castedValues, label="forecasted prices")
-plt.xlim([90,106])
 plt.title("price changes: observed and predicted")
 
 plt.subplot(3,1,3)
 plt.plot(scaledXValues,castedValues, label="forecasted prices")
-plt.xlim([90,106])
 plt.title("forecasted values (Tomorrow's price change: "+str(model_fit.forecast(1))+")")
 plt.show()
 

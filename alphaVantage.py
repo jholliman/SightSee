@@ -24,9 +24,11 @@ class AlphaVantage:
         print('getting data for the folling symbols: ')
         print(symbolList)
         os.chdir(folderName)
-        print('the size of watchlist is ' + str(dataFile.size))
+        print('the size of watchlist is ' + str(len(symbolList)))
+        
         #download data from AlphaVantage
-        for i in range(1,dataFile.size):
+        #using modulus to pause every 5 downloads(API limits), which also explains loop starting at 1 rather than 0
+        for i in range(1,len(symbolList)+1):
 
             #sleep once in a while because API limits
             if i%6 == 0:
