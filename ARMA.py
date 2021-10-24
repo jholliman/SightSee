@@ -17,13 +17,14 @@ warnings.filterwarnings('ignore')
 todaysDate = datetime.today().strftime('%Y-%m-%d')
 AV = AlphaVantage()
 
-AV.downloadMultiple('Watchlist_small')
-
 
 tickerStr = "SPY"
 fileName = 'daily_'+tickerStr+ '_' + todaysDate
 
 dataFile = pd.read_csv(fileName, sep=',')
+
+#AV.downloadDailyMultiple('Watchlist_small')
+AV.downloadDaily('SPY')
 
 closePrice = list(reversed(dataFile['adjusted_close']))
 dates = list(reversed(dataFile['timestamp']))
