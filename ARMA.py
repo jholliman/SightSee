@@ -11,7 +11,6 @@ import pandas as pd
 import warnings
 from alphaVantage import AlphaVantage
 from datetime import datetime
-
 warnings.filterwarnings('ignore')
 
 todaysDate = datetime.today().strftime('%Y-%m-%d')
@@ -19,20 +18,24 @@ AV = AlphaVantage()
 
 
 tickerStr = "SPY"
+sampleSize = 200 #how many previous samples to consider, be it days or minutes if intraday data
+
 fileName = 'daily_'+tickerStr+ '_' + todaysDate
 
 dataFile = pd.read_csv(fileName, sep=',')
 
 #AV.downloadDailyMultiple('Watchlist_small')
-AV.downloadDaily('SPY')
+#AV.downloadDaily('SPY')
 
-closePrice = list(reversed(dataFile['adjusted_close']))
-dates = list(reversed(dataFile['timestamp']))
+closePrice = list(reversed(dataFile['adjusted_close'][0:sampleSize]))
+dates = list(reversed(dataFile['timestamp'][0:sampleSize]))
 print('length of close price array: ' + str(len(closePrice)))
+
+
 
 diffPrice = list()
 diffPrice.append(0)
-for i in range(1,len(closePrice)):
+for i in range(1,sampleSize):
     diffPrice.append((closePrice[i]-closePrice[i-1]))
 
 
@@ -88,7 +91,7 @@ plt.show()
 
 plt.plot(diffPrice, label="differenced price")
 plt.plot(model_fit.predict(), label="model price")
-plt.xlim([0,106])
+plt.xlim(sampleSize-100,sampleSize+10)
 plt.title("price changes: observed and predicted")
 plt.show()
 
@@ -106,17 +109,20 @@ fig.subplots_adjust(hspace=.5)
 
 plt.subplot(3,1,1)
 plt.plot(closePrice, label="closing price")
+plt.xlim(sampleSize-100,sampleSize+10)
 plt.title(tickerStr + "Price")
 
 plt.subplot(3,1,2)
 plt.plot(diffPrice, label="differenced price")
 plt.plot(model_fit.predict(), label="model price")
 plt.plot(scaledXValues,castedValues, label="forecasted prices")
+plt.xlim(sampleSize-100,sampleSize+10)
 plt.title("price changes: observed and predicted")
 
 plt.subplot(3,1,3)
 plt.plot(scaledXValues,castedValues, label="forecasted prices")
 plt.title("forecasted values (Tomorrow's price change: "+str(model_fit.forecast(1))+")")
+plt.xlim(sampleSize-100,sampleSize+10)
 plt.show()
 
 
