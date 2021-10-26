@@ -40,9 +40,11 @@ class AlphaVantage:
                 writer.writerow(line.decode('utf-8').split(','))
             initialFile.close()
         print("successfully wrote daily " + symbol + " data to CSV")
+        self.rmEmptyRows(folderName,fileStr)
 
         #read original CSV and re-write without any empty rows 
         #not sure why ALphaVantage sometimes has empty rows
+        '''
         oldCSV = open(fileStr, 'r')
         cleanedCSV = open(fileStr+'_edit', 'w')
         writer = csv.writer(cleanedCSV)
@@ -57,7 +59,7 @@ class AlphaVantage:
         os.remove(fileStr)
         os.rename(fileStr+'_edit',fileStr)
         print("successfully cleaned data. " + str(emptyRowCounter) + " empty rows removed")
-
+'''
     #for downloading daily data on multiple tickers. 
     # symbolList must be csv with header indicating which row contains the stock "symbol"
     def downloadDailyMultiple(self, symbolList):
@@ -77,14 +79,13 @@ class AlphaVantage:
         #download data from AlphaVantage
         #using modulus to pause every 5 downloads(API limits), which also explains loop starting at 1 rather than 0
         for i in range(1,len(symbolList)+1):
-
+            symbol=symbolList[i-1]
             #sleep once in a while because API limits
             if i%6 == 0:
                 time.sleep(60)
             
-            symbol = str(symbolList[i-1])
-            print("getting data for symbol: " + symbol)
-            urlStr = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol='+symbol+'&outputsize=compact&apikey=AXZVX7TJLYCJBNPU&datatype=csv'
+            #HTTP request stuff
+            urlStr = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol='+symbol+'&outputsize=full&apikey=AXZVX7TJLYCJBNPU&datatype=csv'
             fileStr = "daily_" + symbol + "_" + self.todaysDate
             requestAV = requests.get(urlStr)
             print('what is http response: ' + str(requestAV))
@@ -96,19 +97,33 @@ class AlphaVantage:
                 for line in requestAV.iter_lines():
                     writer.writerow(line.decode('utf-8').split(','))
                 initialFile.close()
+            print("successfully wrote daily " + symbol + " data to CSV")
+            self.rmEmptyRows(folderName,fileStr)
 
-            #read original CSV and re-write without any empty rows 
-            #not sure why ALphaVantage sometimes has empty rows
-            oldCSV = open(fileStr, 'r')
-            cleanedCSV = open(fileStr+'_edit', 'w')
-            writer = csv.writer(cleanedCSV)
-            for row in csv.reader(oldCSV):
-                print(row)
-                if len(row)>1:
-                    writer.writerow(row)
-            oldCSV.close()
-            cleanedCSV.close()
-            os.remove(fileStr)
-            os.rename(fileStr+'_edit',fileStr)
+
+    #used to remove empty rows from ALphaVantage data
+    #read original CSV and re-write without any empty rows 
+    #not sure why ALphaVantage sometimes has empty rows
+    def rmEmptyRows(self,folderName,fileStr):
+
+        #go to directory for that data
+        os.chdir("/home/joel/SightSee/" + folderName)
+        
+
+        #open CSV data file, should be data for a single stock symbol
+        oldCSV = open(fileStr, 'r')
+        cleanedCSV = open(fileStr+'_edit', 'w')
+        writer = csv.writer(cleanedCSV)
+        emptyRowCounter = 0
+        for row in csv.reader(oldCSV):
+            if len(row)>1:
+                writer.writerow(row)
+            else:
+                emptyRowCounter+=1
+        oldCSV.close()
+        cleanedCSV.close()
+        os.remove(fileStr)
+        os.rename(fileStr+'_edit',fileStr)
+        print("successfully cleaned data. " + str(emptyRowCounter) + " empty rows removed")
 
 
