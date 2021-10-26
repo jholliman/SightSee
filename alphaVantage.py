@@ -42,24 +42,6 @@ class AlphaVantage:
         print("successfully wrote daily " + symbol + " data to CSV")
         self.rmEmptyRows(folderName,fileStr)
 
-        #read original CSV and re-write without any empty rows 
-        #not sure why ALphaVantage sometimes has empty rows
-        '''
-        oldCSV = open(fileStr, 'r')
-        cleanedCSV = open(fileStr+'_edit', 'w')
-        writer = csv.writer(cleanedCSV)
-        emptyRowCounter = 0
-        for row in csv.reader(oldCSV):
-            if len(row)>1:
-                writer.writerow(row)
-            else:
-                emptyRowCounter+=1
-        oldCSV.close()
-        cleanedCSV.close()
-        os.remove(fileStr)
-        os.rename(fileStr+'_edit',fileStr)
-        print("successfully cleaned data. " + str(emptyRowCounter) + " empty rows removed")
-'''
     #for downloading daily data on multiple tickers. 
     # symbolList must be csv with header indicating which row contains the stock "symbol"
     def downloadDailyMultiple(self, symbolList):
