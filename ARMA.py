@@ -18,12 +18,14 @@ todaysDate = datetime.today().strftime('%Y-%m-%d')
 tickerStr = "SPY"
 sampleSize = 30 #how many previous samples to consider in ARMA model, be it days or minutes
 forecastDays = 5
+acLagDays = 7
 ########################################
 
 AV = AlphaVantage()
 
 #AV.downloadDailyMultiple('Watchlist_small')
-AV.downloadDaily(tickerStr)
+#AV.downloadDaily(tickerStr)
+AV.downloadDailyMultiple("Watchlist_small")
 
 fileName = 'daily_'+tickerStr+ '_' + todaysDate
 dataFile = pd.read_csv(fileName, sep=',')
@@ -50,8 +52,8 @@ print(diffPrice)
 #print(f'ADF Statistic: {ad_fuller_result[0]}')
 #print(f'p-value: {ad_fuller_result[1]}')
 
-acf_1 =  acf(diffPrice, nlags=3)
-pacf_1 = pacf(diffPrice, nlags=3)
+acf_1 =  acf(diffPrice, nlags=acLagDays)
+pacf_1 = pacf(diffPrice, nlags=acLagDays)
 print(max(abs(acf_1[1:])))
 
 
