@@ -16,16 +16,17 @@ warnings.filterwarnings('ignore')
 #configurable variables###############
 todaysDate = datetime.today().strftime('%Y-%m-%d')
 tickerStr = "SPY"
-sampleSize = 150 #how many previous samples to consider in ARMA model, be it days or minutes
+sampleSize = 30 #how many previous samples to consider in ARMA model, be it days or minutes
 forecastDays = 5
 ########################################
 
 AV = AlphaVantage()
-fileName = 'daily_'+tickerStr+ '_' + todaysDate
-dataFile = pd.read_csv(fileName, sep=',')
 
 #AV.downloadDailyMultiple('Watchlist_small')
-#AV.downloadDaily('SPY')
+AV.downloadDaily(tickerStr)
+
+fileName = 'daily_'+tickerStr+ '_' + todaysDate
+dataFile = pd.read_csv(fileName, sep=',')
 
 #get close price and date lists from CSV
 closePrice = list(reversed(dataFile['adjusted_close'][0:sampleSize]))
@@ -38,7 +39,10 @@ diffPrice.append(0)
 for i in range(1,sampleSize):
     diffPrice.append((closePrice[i]-closePrice[i-1]))
 print('length of price changed array: ' + str(len(diffPrice)))
-
+print("closing price:")
+print(closePrice)
+print("differenced price")
+print(diffPrice)
 # Augmented Dickey-Fuller test
 
 #data = pd.read_csv('jj.csv')
@@ -46,8 +50,8 @@ print('length of price changed array: ' + str(len(diffPrice)))
 #print(f'ADF Statistic: {ad_fuller_result[0]}')
 #print(f'p-value: {ad_fuller_result[1]}')
 
-acf_1 =  acf(diffPrice, nlags=10)
-pacf_1 = pacf(diffPrice, nlags=10)
+acf_1 =  acf(diffPrice, nlags=3)
+pacf_1 = pacf(diffPrice, nlags=3)
 print(max(abs(acf_1[1:])))
 
 
